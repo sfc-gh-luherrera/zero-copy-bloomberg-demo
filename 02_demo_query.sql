@@ -1,0 +1,45 @@
+-- =====================================================================
+-- THE DEMO QUERY — live Bloomberg Data License x internal holdings
+-- Zero ETL: the Bloomberg listing is joined in place with proprietary data.
+-- =====================================================================
+
+-- (A) INVESTMENT RESEARCH — mispriced assets
+-- Live Bloomberg price + consensus target + ratings vs internal fair value / rating
+WITH pos AS (
+  SELECT h.PORTFOLIO_ID, m.*, h.QUANTITY,
+         h.QUANTITY * m.PX_LAST * fx.USD_PER_UNIT / IFF(m.SECURITY_TYP = 'Common Stock', 1, 100) AS MV_USD
+  FROM INTERNAL_PORTFOLIO.CORE.HOLDINGS h
+  JOIN BLOOMBERG_DATA_LICENSE.DL.SECURITIES_MARKET_DATA m ON m.ID_ISIN = h.ID_ISIN
+  JOIN INTERNAL_PORTFOLIO.CORE.FX_RATES fx ON fx.CRNCY = m.CRNCY
+)
+SELECT p.TICKER, p.NAME, p.BICS_LEVEL_1_SECTOR_NAME AS SECTOR,
+       p.PX_LAST, p.CHG_PCT_1D, p.RTG_SP, p.RTG_MOODY,
+       ROUND((p.BEST_TARGET_PRICE / p.PX_LAST - 1) * 100, 1)    AS STREET_UPSIDE_PCT,
+       a.INTERNAL_RATING, a.INTERNAL_CREDIT_OUTLOOK,
+       ROUND((a.INTERNAL_FAIR_VALUE / p.PX_LAST - 1) * 100, 1)  AS INTERNAL_UPSIDE_PCT,
+       ROUND(SUM(p.MV_USD) / 1e6, 1)                            AS FIRM_MV_USD_MM,
+       a.THESIS
+FROM pos p
+JOIN INTERNAL_PORTFOLIO.CORE.ANALYST_VIEWS a ON a.ID_ISIN = p.ID_ISIN
+WHERE p.SECURITY_TYP = 'Common Stock'
+GROUP BY ALL
+HAVING ABS(INTERNAL_UPSIDE_PCT - STREET_UPSIDE_PCT) >= 15      -- our view diverges from the Street
+ORDER BY ABS(INTERNAL_UPSIDE_PCT - STREET_UPSIDE_PCT) DESC;
+
+-- (B) PORTFOLIO RISK — real-time sector concentration vs mandate limits
+WITH pos AS (
+  SELECT h.PORTFOLIO_ID, m.BICS_LEVEL_1_SECTOR_NAME AS SECTOR, m.ISSUER_TICKER,
+         h.QUANTITY * m.PX_LAST * fx.USD_PER_UNIT / IFF(m.SECURITY_TYP = 'Common Stock', 1, 100) AS MV_USD
+  FROM INTERNAL_PORTFOLIO.CORE.HOLDINGS h
+  JOIN BLOOMBERG_DATA_LICENSE.DL.SECURITIES_MARKET_DATA m ON m.ID_ISIN = h.ID_ISIN
+  JOIN INTERNAL_PORTFOLIO.CORE.FX_RATES fx ON fx.CRNCY = m.CRNCY
+)
+SELECT p.PORTFOLIO_ID, pf.PORTFOLIO_NAME, p.SECTOR,
+       ROUND(SUM(p.MV_USD) / 1e6, 1) AS MV_USD_MM,
+       ROUND(100 * RATIO_TO_REPORT(SUM(p.MV_USD)) OVER (PARTITION BY p.PORTFOLIO_ID), 2) AS WEIGHT_PCT,
+       pf.SECTOR_LIMIT_PCT,
+       IFF(WEIGHT_PCT > pf.SECTOR_LIMIT_PCT, 'BREACH',
+           IFF(WEIGHT_PCT > 0.85 * pf.SECTOR_LIMIT_PCT, 'WARNING', 'OK')) AS LIMIT_STATUS
+FROM pos p JOIN INTERNAL_PORTFOLIO.CORE.PORTFOLIOS pf USING (PORTFOLIO_ID)
+GROUP BY ALL
+ORDER BY p.PORTFOLIO_ID, WEIGHT_PCT DESC;
