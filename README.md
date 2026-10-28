@@ -25,6 +25,8 @@ internal holdings answers two analyst questions in about a second — no CSV exp
 | `app/streamlit_app.py` | Streamlit in Snowflake app: live query button, research table, sector heatmap, issuer watchlist. |
 | `docs/screenshots/` | Screenshots used in the README and presentation. |
 
+> **Presenting this demo?** Read the [Presenter Guide](docs/PRESENTER_GUIDE.md) for prerequisites, a day-of checklist, Q&A and troubleshooting.
+
 ## Setup (≈ 5 minutes)
 
 1. Run `01_setup_data.sql` in a Snowsight worksheet. Adjust the `USE ROLE` / `USE WAREHOUSE` lines at the top to your environment.
