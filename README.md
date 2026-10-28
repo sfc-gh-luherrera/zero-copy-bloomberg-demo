@@ -67,7 +67,7 @@ map the column names in `POSITIONS_CTE` (top of `app/streamlit_app.py`). Holding
 | 0:00 | **Hook** — "Analysts lose ~80% of their morning to CSV exports, Excel glue and reconciliation before any analysis happens." | App title |
 | 0:15 | **The query** — "Bloomberg's data sits in our account as a zero-copy listing. One join against our own holdings." | *Show the query* → **Run live query** |
 | 0:45 | **Results** — "About a second. Card A: 11 names where our fair value disagrees with the Street. Card B: two sector breaches — GEQ-01 is 180% of its tech limit." | Cards A and B |
-| 1:15 | **Takeaway** — "Live today across 32 Bloomberg Data License listings supporting 57 joint clients. Zero bytes copied, 100% governed, 90 seconds to insight." | Footer metrics |
+| 1:15 | **Takeaway** — "Live today across 32 Bloomberg Data License listings on Snowflake Marketplace, with 82 active data shares across 57 customers. Zero bytes copied, 100% governed, 90 seconds to insight." | Footer metrics |
 
 ## Notes
 

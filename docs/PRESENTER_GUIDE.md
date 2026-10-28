@@ -83,7 +83,10 @@ The deck's speaker notes cover the slides around the demo.
 - **"Who pays for the compute?"** The consumer, using their own warehouse. The share itself doesn't copy storage.
 - **"How fresh is the data?"** As fresh as the provider's share. There's no refresh job on the consumer side.
 - **"Can we govern it?"** Yes. Standard roles, masking and row access policies apply to the joined result.
-- **Listing and client counts on the slides:** check them against the current Marketplace before an external session.
+- **"What's on the Marketplace today?"** 32 Bloomberg Data License listings ([provider page](https://app.snowflake.com/marketplace/providers/GZU6Z9SLGH3/Bloomberg)) covering reference, pricing, fundamentals, corporate actions, ESG and more, with 82 active data shares across 57 customers. Snowflake is the first external data platform Bloomberg delivers through.
+- **"What's coming?"** Roadmap, subject to change: 100+ historical-data listings from Bloomberg's Qube Data Store, and Bloomberg MCP servers planned for later this year. Say "planned"; don't promise dates.
+- **Listing and customer counts on the slides:** check them against the current Marketplace before an external session. Region availability varies by listing.
+- **Customer follow-ups that involve Bloomberg:** bring in your Snowflake account team, who will involve the right Bloomberg partnership contacts.
 
 ---
 
